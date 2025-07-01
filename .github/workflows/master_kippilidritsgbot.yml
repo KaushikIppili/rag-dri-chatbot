@@ -7,10 +7,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
       contents: read
 
     steps:
@@ -23,10 +22,11 @@ jobs:
           python-version: '3.11'
 
       - name: Install backend dependencies
-        run: pip install -r backend/requirements.txt
+        working-directory: ./backend
+        run: pip install -r requirements.txt
 
-      - name: Zip app for deployment
-        run: zip -r release.zip . -x '*.git*'
+      - name: Zip for deployment
+        run: zip -r release.zip backend frontend startup.sh
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -34,20 +34,28 @@ jobs:
           name: python-app
           path: release.zip
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      - name: Unzip for deployment
-        run: unzip release.zip
+      - name: Unzip artifact
+        run: unzip -o release.zip
 
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_28F5BBE5117F4607BE2FAA9EF1CA65FF }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E3D1155006C1488D96092D8DFB7AC6B4 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_ACFC768B30EE4BE7BD4EC1F0E147823A }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
