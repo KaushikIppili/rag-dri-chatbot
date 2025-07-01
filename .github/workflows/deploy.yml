@@ -3,7 +3,7 @@ name: Deploy RAG Chatbot to Azure
 on:
   push:
     branches:
-      - master  # <-- your branch name
+      - master
 
 jobs:
   build-and-deploy:
@@ -19,12 +19,12 @@ jobs:
         python-version: '3.10'
 
     - name: 📦 Install dependencies from backend/
-      working-directory: backend
       run: |
+        cd backend
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: 🚀 Deploy to Azure Web App
+    - name: 🚀 Deploy backend to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: kippilidritsgbot
