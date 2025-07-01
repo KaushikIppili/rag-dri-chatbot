@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DRI Assistant Chatbot</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 800px; margin: auto; }
+    #chat { white-space: pre-wrap; border: 1px solid #ddd; padding: 10px; min-height: 300px; }
+    textarea { width: 100%; height: 80px; }
+    button { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>DRI Assistant Chatbot</h1>
+  <div id="chat"></div>
+  <textarea id="query" placeholder="Describe the ICM issue here..."></textarea>
+  <button onclick="sendQuery()">Submit</button>
+
+  <script>
+    async function sendQuery() {
+      const query = document.getElementById('query').value;
+      document.getElementById('chat').innerText += `\n\nYou: ${query}`;
+      const res = await fetch('http://localhost:8000/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+      const data = await res.json();
+      document.getElementById('chat').innerText += `\n\nBot: ${data.answer}`;
+      document.getElementById('query').value = '';
+    }
+  </script>
+</body>
+</html>
