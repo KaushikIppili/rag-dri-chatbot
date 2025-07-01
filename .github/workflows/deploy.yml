@@ -18,9 +18,9 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: 📦 Install dependencies from backend/
+    - name: 📦 Install dependencies
+      working-directory: ./backend
       run: |
-        cd backend
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
@@ -30,4 +30,4 @@ jobs:
         app-name: kippilidritsgbot
         slot-name: 'production'
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-        package: backend
+        package: ./backend
