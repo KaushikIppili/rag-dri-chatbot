@@ -4,8 +4,19 @@ import requests
 import openai
 import os
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
 
 app = FastAPI()
+
+# Serve static frontend
+app.mount("/static", StaticFiles(directory="../frontend"), name="static")
+
+@app.get("/")
+async def serve_frontend():
+    return FileResponse("../frontend/index.html")
+
 
 app.add_middleware(
     CORSMiddleware,
