@@ -18,16 +18,16 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: 📦 Install dependencies
-      working-directory: ./backend
+    - name: 📦 Install dependencies from backend/
+      working-directory: backend
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: 🚀 Deploy backend to Azure Web App
+    - name: 🚀 Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: kippilidritsgbot
         slot-name: 'production'
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-        package: ./backend
+        package: backend
