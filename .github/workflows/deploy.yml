@@ -3,7 +3,7 @@ name: Deploy RAG Chatbot to Azure
 on:
   push:
     branches:
-      - main
+      - master  # <-- your branch name
 
 jobs:
   build-and-deploy:
