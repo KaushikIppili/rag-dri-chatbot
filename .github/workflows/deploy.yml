@@ -3,11 +3,15 @@ name: Deploy RAG Chatbot to Azure
 on:
   push:
     branches:
-      - main  # or your branch name
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend  # 👈 key change here
 
     steps:
     - name: 📥 Checkout code
@@ -26,7 +30,7 @@ jobs:
     - name: 🚀 Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: kippilidritsgbot  # Your app name
+        app-name: kippilidritsgbot
         slot-name: 'production'
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-        package: .
+        package: backend  # 👈 also tell it what folder to deploy
