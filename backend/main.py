@@ -43,7 +43,7 @@ client = AzureOpenAI(
     azure_endpoint=AZURE_OPENAI_ENDPOINT,
 )
 
-ICM_INDEX = "icm-index"
+ICM_INDEX = "icmindex"
 TSG_INDEX = "tsgindex"
 
 SYSTEM_INSTRUCTIONS = """
@@ -84,7 +84,7 @@ Follow these instructions:
 """
 
 def search_index(query: str, index: str):
-    url = f"{AZURE_SEARCH_ENDPOINT}/indexes/{index}/docs/search?api-version=2023-07-01-Preview"
+    url = f"{AZURE_SEARCH_ENDPOINT}/indexes/{index}/docs/search?api-version=2025-05-01-preview"
     headers = {
         "Content-Type": "application/json",
         "api-key": AZURE_SEARCH_API_KEY
