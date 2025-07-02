@@ -7,7 +7,8 @@ import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from openai import AzureOpenAI
-from openai._exceptions import RateLimitError, APIError, Timeout, OpenAIError
+from openai._exceptions import RateLimitError, APIError, OpenAIError
+import httpx  # Optional for timeout handling
 
 app = FastAPI()
 
@@ -137,7 +138,7 @@ async def get_chat_completion_with_retry(prompt: str, max_retries=3, delay=2):
                     "total_tokens": usage.total_tokens
                 }
             }
-        except (RateLimitError, Timeout, APIError) as e:
+        except (RateLimitError, APIError, httpx.TimeoutException) as e:
             print(f"⚠️ Attempt {attempt + 1} failed: {str(e)}")
             if attempt < max_retries - 1:
                 await asyncio.sleep(delay)

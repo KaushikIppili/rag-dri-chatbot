@@ -3,3 +3,4 @@ uvicorn
 openai==1.93.0
 requests
 python-dotenv
+httpx
