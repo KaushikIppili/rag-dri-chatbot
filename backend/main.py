@@ -16,15 +16,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve static files from frontend folder
-app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+# ❗ Serve frontend at /frontend NOT root
+app.mount("/frontend", StaticFiles(directory="frontend", html=True), name="frontend")
 
 class QueryRequest(BaseModel):
     query: str
 
 AZURE_SEARCH_ENDPOINT = os.getenv("AZURE_SEARCH_ENDPOINT")
 AZURE_SEARCH_API_KEY = os.getenv("AZURE_SEARCH_API_KEY")
-print("AZURE_SEARCH_ENDPOINT =", AZURE_SEARCH_ENDPOINT)
 ICM_INDEX = "icm-index"
 TSG_INDEX = "tsgindex"
 
@@ -71,11 +70,8 @@ async def query_endpoint(request: QueryRequest):
             temperature=0.3,
             max_tokens=1000
         )
-        print(completion)
 
         return {"answer": completion["choices"][0]["message"]["content"]}
-
+    
     except Exception as e:
-        # log and return error
-        print(completion)
         return {"answer": f"❌ Error: {str(e)}"}
