@@ -121,8 +121,7 @@ async def get_chat_completion_with_retry(prompt: str, max_retries=3, delay=2):
     for attempt in range(max_retries):
         try:
             completion = client.chat.completions.create(
-                model=AZURE_OPENAI_MODEL,
-                deployment_id=AZURE_DEPLOYMENT_NAME,
+                model=AZURE_DEPLOYMENT_NAME,
                 messages=[
                     {"role": "system", "content": SYSTEM_INSTRUCTIONS},
                     {"role": "user", "content": prompt}
