@@ -1,5 +1,5 @@
 fastapi
 uvicorn
-openai==0.28.1
+openai==1.93.0
 requests
 python-dotenv
