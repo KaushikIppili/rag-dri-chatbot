@@ -4,31 +4,158 @@
   <meta charset="UTF-8" />
   <title>DRI Assistant Chatbot</title>
   <style>
-    body { font-family: Arial; padding: 20px; max-width: 800px; margin: auto; }
-    #chat { white-space: pre-wrap; border: 1px solid #ddd; padding: 10px; min-height: 300px; }
-    textarea { width: 100%; height: 80px; }
-    button { margin-top: 10px; }
+    :root {
+      --bg: #121212;
+      --text: #f1f1f1;
+      --user-bubble: #0078d4;
+      --bot-bubble: #2c2c2c;
+      --accent: #005a9e;
+      --border: #333;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #chat {
+      background-color: #1e1e1e;
+      border: 1px solid var(--border);
+      padding: 15px;
+      border-radius: 8px;
+      min-height: 400px;
+      max-height: 600px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bubble {
+      padding: 10px 15px;
+      border-radius: 20px;
+      margin: 10px 0;
+      max-width: 90%;
+      white-space: pre-wrap;
+    }
+
+    .user {
+      background-color: var(--user-bubble);
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    .bot {
+      background-color: var(--bot-bubble);
+      color: var(--text);
+      align-self: flex-start;
+      margin-right: auto;
+    }
+
+    textarea {
+      width: 100%;
+      height: 80px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      resize: none;
+      background-color: #1e1e1e;
+      color: var(--text);
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: var(--user-bubble);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: var(--accent);
+    }
+
+    .typing {
+      font-style: italic;
+      color: #aaa;
+      margin: 5px 0 0 10px;
+    }
   </style>
 </head>
 <body>
-  <h1>DRI Assistant Chatbot</h1>
+  <h1>SCHIE FW Deployment DRI Assistant Bot</h1>
   <div id="chat"></div>
-  <textarea id="query" placeholder="Describe the ICM issue here..."></textarea>
+  <div class="typing" id="typing" style="display: none;">Bot is typing...</div>
+  <textarea id="query" placeholder="Describe the ICM issue here... (Shift+Enter for new line)"></textarea>
   <button onclick="sendQuery()">Submit</button>
 
   <script>
-    async function sendQuery() {
-      const query = document.getElementById('query').value;
-      document.getElementById('chat').innerText += `\n\nYou: ${query}`;
-      const res = await fetch('/query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query })
-      });
-      const data = await res.json();
-      document.getElementById('chat').innerText += `\n\nBot: ${data.answer}`;
-      document.getElementById('query').value = '';
+    const chat = document.getElementById('chat');
+    const textarea = document.getElementById('query');
+    const typing = document.getElementById('typing');
+
+    function appendMessage(role, text) {
+      const msg = document.createElement('div');
+      msg.className = `bubble ${role}`;
+      msg.innerHTML = role === 'bot' ? renderMarkdown(text) : text;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
     }
+
+    function renderMarkdown(text) {
+      return text
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/^- (.*$)/gim, '<li>$1</li>')
+        .replace(/\n/g, '<br />');
+    }
+
+    async function sendQuery() {
+      const query = textarea.value.trim();
+      if (!query) return;
+
+      appendMessage('user', query);
+      textarea.value = '';
+      typing.style.display = 'block';
+
+      try {
+        const res = await fetch('/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        const data = await res.json();
+        typing.style.display = 'none';
+        appendMessage('bot', data.answer);
+      } catch (err) {
+        typing.style.display = 'none';
+        appendMessage('bot', '❌ An error occurred while processing your request.');
+      }
+    }
+
+    // Handle Enter key (submit) and Shift+Enter (newline)
+    textarea.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendQuery();
+      }
+    });
   </script>
 </body>
 </html>
