@@ -7,9 +7,6 @@ import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from openai import AzureOpenAI
-from openai.types.chat.chat_completion import ChatCompletion
-from openai.types.chat.chat_completion_message import ChatCompletionMessage
-from openai.types import Usage
 from openai._exceptions import RateLimitError, APIError, Timeout, OpenAIError
 
 app = FastAPI()
@@ -94,14 +91,13 @@ def search_index(query: str, index: str):
         "search": query,
         "top": 5,
         "queryType": "semantic",
-        "semanticConfiguration": "default",  # as seen in your screenshots
-        "captions": "extractive",            # optional but useful for summarizing
-        "answers": "extractive"              # optional
+        "semanticConfiguration": "default",
+        "captions": "extractive",
+        "answers": "extractive"
     }
     response = requests.post(url, headers=headers, json=body)
     response.raise_for_status()
     return response.json().get("value", [])
-
 
 def build_prompt(user_query, icm_results, tsg_results):
     context = ""
@@ -122,7 +118,7 @@ Assist the DRI (Oncall) in resolving an ICM issue using the **ICM-Index** and th
 async def get_chat_completion_with_retry(prompt: str, max_retries=3, delay=2):
     for attempt in range(max_retries):
         try:
-            completion: ChatCompletion = client.chat.completions.create(
+            completion = client.chat.completions.create(
                 deployment_id=AZURE_DEPLOYMENT_NAME,
                 messages=[
                     {"role": "system", "content": SYSTEM_INSTRUCTIONS},
@@ -131,8 +127,8 @@ async def get_chat_completion_with_retry(prompt: str, max_retries=3, delay=2):
                 temperature=0.3,
                 max_tokens=1500,
             )
-            message: ChatCompletionMessage = completion.choices[0].message
-            usage: Usage = completion.usage
+            message = completion.choices[0].message
+            usage = completion.usage
             return {
                 "answer": message.content,
                 "usage": {
