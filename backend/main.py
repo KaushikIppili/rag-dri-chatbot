@@ -24,6 +24,7 @@ class QueryRequest(BaseModel):
 
 AZURE_SEARCH_ENDPOINT = os.getenv("AZURE_SEARCH_ENDPOINT")
 AZURE_SEARCH_API_KEY = os.getenv("AZURE_SEARCH_API_KEY")
+print("AZURE_SEARCH_ENDPOINT =", AZURE_SEARCH_ENDPOINT)
 ICM_INDEX = "icm-index"
 TSG_INDEX = "tsgindex"
 
@@ -56,18 +57,25 @@ def build_prompt(user_query, icm_results, tsg_results):
 
 @app.post("/query")
 async def query_endpoint(request: QueryRequest):
-    icm_results = search_index(request.query, ICM_INDEX)
-    tsg_results = search_index(request.query, TSG_INDEX)
-    prompt = build_prompt(request.query, icm_results, tsg_results)
+    try:
+        icm_results = search_index(request.query, ICM_INDEX)
+        tsg_results = search_index(request.query, TSG_INDEX)
+        prompt = build_prompt(request.query, icm_results, tsg_results)
 
-    completion = openai.ChatCompletion.create(
-        deployment_id=AZURE_DEPLOYMENT_NAME,
-        messages=[
-            {"role": "system", "content": "You are a technical assistant..."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.3,
-        max_tokens=1000
-    )
+        completion = openai.ChatCompletion.create(
+            deployment_id=AZURE_DEPLOYMENT_NAME,
+            messages=[
+                {"role": "system", "content": "You are a technical assistant for resolving incidents using TSG + ICM history."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+            max_tokens=1000
+        )
+        print(completion)
 
-    return {"answer": completion["choices"][0]["message"]["content"]}
+        return {"answer": completion["choices"][0]["message"]["content"]}
+
+    except Exception as e:
+        # log and return error
+        print(completion)
+        return {"answer": f"❌ Error: {str(e)}"}
