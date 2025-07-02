@@ -84,7 +84,7 @@ Follow these instructions:
 """
 
 def search_index(query: str, index: str):
-    url = f"{AZURE_SEARCH_ENDPOINT}/indexes/{index}/docs/search?api-version=2025-05-01-preview"
+    url = f"{AZURE_SEARCH_ENDPOINT}/indexes/{index}/docs/search?api-version=2023-07-01-Preview"
     headers = {
         "Content-Type": "application/json",
         "api-key": AZURE_SEARCH_API_KEY
