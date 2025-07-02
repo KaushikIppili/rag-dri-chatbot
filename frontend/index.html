@@ -20,7 +20,7 @@
     async function sendQuery() {
       const query = document.getElementById('query').value;
       document.getElementById('chat').innerText += `\n\nYou: ${query}`;
-      const res = await fetch('http://localhost:8000/query', {
+      const res = await fetch('/query', {  // ✅ relative path
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
