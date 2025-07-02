@@ -31,6 +31,7 @@ class QueryRequest(BaseModel):
 AZURE_SEARCH_ENDPOINT = os.getenv("AZURE_SEARCH_ENDPOINT")
 AZURE_SEARCH_API_KEY = os.getenv("AZURE_SEARCH_API_KEY")
 AZURE_DEPLOYMENT_NAME = os.getenv("AZURE_DEPLOYMENT_NAME")
+AZURE_OPENAI_MODEL = os.getenv("AZURE_OPENAI_MODEL")
 AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 AZURE_OPENAI_KEY = os.getenv("AZURE_OPENAI_KEY")
 AZURE_OPENAI_VERSION = os.getenv("AZURE_OPENAI_VERSION", "2024-08-06")
@@ -120,6 +121,7 @@ async def get_chat_completion_with_retry(prompt: str, max_retries=3, delay=2):
     for attempt in range(max_retries):
         try:
             completion = client.chat.completions.create(
+                model=AZURE_OPENAI_MODEL,
                 deployment_id=AZURE_DEPLOYMENT_NAME,
                 messages=[
                     {"role": "system", "content": SYSTEM_INSTRUCTIONS},
