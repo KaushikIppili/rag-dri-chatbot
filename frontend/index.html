@@ -109,7 +109,7 @@
       padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px; /* tighter spacing between messages */
+      gap: 6px; /* tighter spacing between messages */
     }
 
     .message-wrapper {
@@ -263,6 +263,32 @@
       color: #0078d4;
       text-decoration: underline;
     }
+	
+	/* Tighter markdown spacing inside bot messages */
+	.bot p {
+	  margin: 4px 0;
+	}
+
+	.bot h1, .bot h2, .bot h3 {
+	  margin: 6px 0 4px 0;
+	  font-weight: 600;
+	}
+
+	.bot ul, .bot ol {
+	  margin: 4px 0;
+	  padding-left: 20px;
+	}
+
+	.bot li {
+	  margin: 2px 0;
+	}
+
+	.bot pre {
+	  margin: 6px 0;
+	  padding: 8px;
+	  font-size: 0.9rem;
+	}
+
   </style>
 </head>
 <body>
